@@ -1,20 +1,40 @@
 <template>
   <h1>Events For Good</h1>
   <div class="events">
+    <div class="pagination">
+    <router-link
+      id="minPageSize"
+      :to="{ name: 'EventList', query: {  page: page, limit: limit - 1} }"
+      rel="prev"
+      v-if="limit != 1"
+    >
+    - Page size
+    </router-link>
+    {{limit}}
+    <router-link
+      id="addPageSize"
+      :to="{ name: 'EventList', query: {  page: page, limit: limit + 1} }"
+      rel="prev"
+      v-if="limit < totalEvents"
+      >
+      + Page size
+      </router-link>
+    </div>
+    
     <EventCard v-for="event in events" :key="event.id" :event="event" />
     <div class="pagination">
       <router-link
       id="page-prev"
-      :to="{ name: 'EventList', query: { page: page - 1 } }"
+      :to="{ name: 'EventList', query: { page: page - 1, limit: limit} }"
       rel="prev"
       v-if="page != 1"
     >
       Prev Page
     </router-link>
-    <input type="number" v-model="pageSize"/>
+    {{page}}
     <router-link
       id="page-next"
-      :to="{ name: 'EventList', query: { page: page + 1 } }"
+      :to="{ name: 'EventList', query: { page: page + 1 , limit: limit} }"
       rel="next"
       v-if="hasNextPage"
     >
@@ -37,6 +57,10 @@ export default {
     page: {
       type: Number,
       required: true
+    },
+    limit: {
+      type: Number,
+      required: true
     }
   },
   components: {
@@ -46,15 +70,15 @@ export default {
     return {
       events: null,
       totalEvents: 0,
-      pageSize: 2
     }
   },
   created() {
     watchEffect(() => {
-      EventService.getEvents(this.pageSize, this.page)
+      EventService.getEvents(this.limit, this.page)
         .then((res) => {
           this.events = res.data
           this.totalEvents = res.headers['x-total-count']
+          console.log(res.headers)
         })
         .catch((err) => {
           console.log(err)
@@ -63,7 +87,7 @@ export default {
   },
   computed: {
     hasNextPage() {
-      let totalPages = Math.ceil(this.totalEvents / 2)
+      let totalPages = Math.ceil(this.totalEvents / this.limit)
       return this.page < totalPages
     }
   }
@@ -89,5 +113,11 @@ export default {
 }
 #page-next {
   text-align: right;
+}
+#addPageSize {
+  text-align: right;
+}
+#minPageSize {
+  text-align: left;
 }
 </style>
