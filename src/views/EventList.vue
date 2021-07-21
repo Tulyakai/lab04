@@ -78,7 +78,6 @@ export default {
         .then((res) => {
           this.events = res.data
           this.totalEvents = res.headers['x-total-count']
-          console.log(res.headers)
         })
         .catch((err) => {
           console.log(err)
