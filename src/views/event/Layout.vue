@@ -21,6 +21,7 @@ export default {
     created() {
         EventService.getEvent(this.id)
         .then((res) => {
+            console.log(res)
           this.event = res.data
         })
         .catch((err) => {
